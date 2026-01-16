@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Smart Attendance System</title>
+
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: "Poppins", Arial, sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(135deg, yellow, #00796b);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  header {
+    color: white;
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+  }
+
+  .card {
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 30px 25px;
+    width: 90%;
+    max-width: 420px;
+    text-align: center;
+    color: #fff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    animation: fadeIn 0.8s ease;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+  }
+
+  h2 {
+    margin: 10px 0;
+    font-weight: 500;
+  }
+
+  p {
+    font-size: 15px;
+    opacity: 0.9;
+  }
+
+  .btn {
+    margin-top: 25px;
+    padding: 14px 24px;
+    width: 100%;
+    font-size: 17px;
+    font-weight: 500;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #00f7ff, #1d83e9);
+    color: #4d002a;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  #status {
+    margin-top: 18px;
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  footer {
+    margin-top: 25px;
+    color: white;
+    font-size: 13px;
+    opacity: 0.85;
+  }
+</style>
+</head>
+
+<body>
+
+<header>📍 Smart Attendance</header>
+
+<div class="card">
+  <div class="icon">📱</div>
+  <h2>QR Scan Successful</h2>
+  <p>Please allow location access to mark your attendance</p>
+
+  <button class="btn" id="markBtn">
+    Allow Location & Mark Attendance
+  </button>
+
+  <div id="status"></div>
+</div>
+
+<footer>
+  Built for Hackathon ✨ | Team:TECH TITANS
+</footer>
+
+<script>
+  const CLASS_LAT = 8.490349;   // Replace
+  const CLASS_LNG = 76.972027;   // Replace
+  const MAX_DISTANCE_METERS = 150;
+
+  function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
+    const R = 6371000;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
+  document.getElementById("markBtn").addEventListener("click", () => {
+    const status = document.getElementById("status");
+    status.innerText = "📡 Checking your location...";
+
+    if (!navigator.geolocation) {
+      status.innerText = "❌ Geolocation not supported.";
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const distance = getDistanceFromLatLonInMeters(
+          CLASS_LAT,
+          CLASS_LNG,
+          position.coords.latitude,
+          position.coords.longitude
+        );
+
+        if (distance <= MAX_DISTANCE_METERS) {
+          status.innerText = "✅ Location verified. Redirecting...";
+          setTimeout(() => {
+            window.location.href = "https://docs.google.com/forms/d/1W-LtshzZ_I1Gf7_0nrDpVNUUI-bbAyDfzMPYq_tigIc/edit#response=ACYDBNif-jHdvZ-fhl9khFgskJeWdvPcfxBN74NEu9dQDoYoIWR5jZnLPL80x94jVZA3G3U";
+          }, 1200);
+        } else {
+          status.innerText =
+            "❌ You are outside the classroom. Attendance denied.";
+        }
+      },
+      () => {
+        status.innerText =
+          "⚠️ Location permission denied. Please allow access.";
+      },
+      { enableHighAccuracy: true }
+    );
+  });
+</script>
+
+</body>
+</html>
